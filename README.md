@@ -15,7 +15,7 @@ This project contains a backend server and a frontend client.
 2. Navigate to the backend directory:
    ```bash
    cd backend
-````
+```
 
 3. Install dependencies:
 
