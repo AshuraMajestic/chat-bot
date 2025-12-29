@@ -1,20 +1,18 @@
-````md
 # Chat Bot Project
 
-This project consists of a **Backend** (Node.js + SQLite) and a **Frontend** (Vite + React).
-
-Follow the steps below to run the project locally.
+This project contains a backend server and a frontend client.
 
 ---
 
-## 🚀 How to Start
+## How to Start the Project
 
 ---
 
-## 🖥️ Backend Setup
+## Backend Setup
 
-1. **Open terminal**
-2. Navigate to the backend folder:
+1. Open a terminal.
+
+2. Navigate to the backend directory:
    ```bash
    cd backend
 ````
@@ -31,18 +29,21 @@ Follow the steps below to run the project locally.
    npm run migrate
    ```
 
-5. Create a `.env` file inside the `backend` folder and add:
+5. Create a `.env` file inside the `backend` folder and add the following:
 
    ```env
    ROUTEWAY_API_KEY=API_KEY
    ```
 
-   🔗 Get your API key from:
-   [https://routeway.ai/dashboard](https://routeway.ai/dashboard)
+6. Get your API key from:
 
-   > Note: Routeway AI is free to use, but responses may be slow.
+   ```
+   https://routeway.ai/dashboard
+   ```
 
-6. Start the backend server:
+   Note: Routeway AI is free to use but responses can be slow.
+
+7. Start the backend server:
 
    ```bash
    npm run dev
@@ -50,11 +51,11 @@ Follow the steps below to run the project locally.
 
 ---
 
-## 🌐 Frontend Setup
+## Frontend Setup
 
-1. **Open a new terminal**
+1. Open a new terminal.
 
-2. Navigate to the frontend folder:
+2. Navigate to the frontend directory:
 
    ```bash
    cd frontend
@@ -72,7 +73,7 @@ Follow the steps below to run the project locally.
    npm run dev
    ```
 
-5. Open your browser and visit:
+5. Open your browser and go to:
 
    ```
    http://localhost:5173/
@@ -80,23 +81,17 @@ Follow the steps below to run the project locally.
 
 ---
 
-## ✅ Notes
+## Notes
 
-* Make sure the backend server is running **before** sending messages from the frontend.
-* SQLite database is created automatically when migrations run.
-* `.env` file should **not** be committed to version control.
-
----
-
-## 📦 Tech Stack
-
-* **Backend:** Node.js, Express, SQLite
-* **Frontend:** React, Vite
-* **AI API:** Routeway AI
+* Ensure the backend server is running before using the frontend.
+* The SQLite database is created automatically after running migrations.
+* Do not commit the `.env` file to version control.
 
 ---
 
-Happy Coding! 🚀
+## Tech Stack
 
-```
-```
+* Backend: Node.js, Express, SQLite
+* Frontend: React, Vite
+* AI API: Routeway AI
+
