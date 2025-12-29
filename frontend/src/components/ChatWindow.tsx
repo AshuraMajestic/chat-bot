@@ -29,20 +29,49 @@ export default function ChatWindow() {
     }
   }, []);
 
-  const handleSend = async (text: string) => {
-    if (!conversationId) return;
+  // Send message handler
+ const handleSend = async (text: string) => {
+  if (!conversationId) return;
 
-    const userMsg = await sendMessage(conversationId, text, "USER");
-    setMessages((prev) => [...prev, userMsg]);
-
-    // MOCK AI reply (backend will later generate)
-    const aiMsg = await sendMessage(
-      conversationId,
-      `Thanks for contacting support. Regarding "${text}", our team will assist you shortly.`,
-      "AI"
-    );
-    setMessages((prev) => [...prev, aiMsg]);
+  // USER message (optimistic)
+  const tempUserMessage: Message = {
+    id: crypto.randomUUID(),
+    conversation_id: conversationId,
+    sender: "USER",
+    text,
   };
+
+  // AI loading placeholder
+  const aiLoadingMessage: Message = {
+    id: "ai-loading",
+    conversation_id: conversationId,
+    sender: "AI",
+    text: "",
+  };
+
+  setMessages((prev) => [...prev, tempUserMessage, aiLoadingMessage]);
+
+  try {
+    const response = await sendMessage(conversationId, text, "USER");
+
+    setMessages((prev) => {
+      // remove temp + loading
+      const filtered = prev.filter(
+        (m) => m.id !== tempUserMessage.id && m.id !== "ai-loading"
+      );
+
+      return [...filtered, response.userMessage, response.aiMessage];
+    });
+  } catch (error) {
+    console.error("Failed to send message:", error);
+
+    // Remove loading bubble on error
+    setMessages((prev) =>
+      prev.filter((m) => m.id !== "ai-loading")
+    );
+  }
+};
+
 
   return (
     <div
@@ -77,6 +106,39 @@ export default function ChatWindow() {
           padding: "16px",
         }}
       >
+        {/* Empty State */}
+        {messages.length === 0 && (
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              color: "#6b7280",
+              padding: "20px",
+            }}
+          >
+            <div>
+              <h2
+                style={{
+                  marginBottom: "8px",
+                  color: "#111827",
+                }}
+              >
+                👋 Hi, I’m your E-commerce Assistant
+              </h2>
+              <p>
+                I can help you with orders, deliveries, refunds,
+                payments, and product questions.
+                <br />
+                Ask me anything to get started.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Chat Messages */}
         {messages.map((m) => (
           <MessageBubble key={m.id} message={m} />
         ))}

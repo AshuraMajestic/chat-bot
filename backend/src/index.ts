@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { db } from './database/connection';
-import conversationRouter from './routes/Conversation';
+import conversationRouter from './routes/conversation';
 import messageRouter from './routes/message';
 
 dotenv.config();

@@ -1,23 +1,54 @@
 import { Router } from 'express';
 import { MessageModel } from '../models/Message';
-import { Sender } from '../types';
+import { Message, Sender } from '../types';
+import { generateAIReply } from '../services/ai';
 
 const messageRouter = Router();
 
 // Create a new message
-messageRouter.post('/', (req, res) => {
+messageRouter.post("/", async (req, res) => {
   try {
     const { conversation_id, sender, text } = req.body;
-    
-    // Validate sender
-    if (sender !== Sender.USER && sender !== Sender.AI) {
-      return res.status(400).json({ error: 'Invalid sender. Must be USER or AI' });
+
+    if (!conversation_id || !text) {
+      return res.status(400).json({ error: "conversation_id and text are required" });
     }
 
-    const message = MessageModel.create({ conversation_id, sender, text });
-    res.status(201).json(message);
+    if (sender !== Sender.USER) {
+      return res.status(400).json({
+        error: "Only USER messages are allowed to initiate a conversation",
+      });
+    }
+
+    // 1️⃣ Save USER message
+    const userMessage = MessageModel.create({
+      conversation_id,
+      sender: Sender.USER,
+      text,
+    });
+
+    // 2️⃣ Fetch conversation history (AFTER saving user message)
+    const history: Message[] =
+      MessageModel.findByConversationId(conversation_id);
+
+    // 3️⃣ Generate AI reply using history + current message
+    const aiText = await generateAIReply(history, text);
+
+    // 4️⃣ Save AI message
+    const aiMessage = MessageModel.create({
+      conversation_id,
+      sender: Sender.AI,
+      text: aiText,
+    });
+
+    // 5️⃣ Return both messages
+    res.status(201).json({
+      userMessage,
+      aiMessage,
+    });
   } catch (error) {
-    res.status(400).json({ error: 'Failed to create message' });
+    console.error("Message processing failed:", error);
+    res.status(500).json({ error: "Failed to process message" });
   }
 });
 
@@ -40,29 +71,6 @@ messageRouter.get('/:id', (req, res) => {
 messageRouter.get('/conversation/:conversationId', (req, res) => {
   const messages = MessageModel.findByConversationId(req.params.conversationId);
   res.json(messages);
-});
-
-// Update message text
-messageRouter.put('/:id', (req, res) => {
-  const { text } = req.body;
-  if (!text) {
-    return res.status(400).json({ error: 'Text is required' });
-  }
-  
-  const updated = MessageModel.update(req.params.id, text);
-  if (!updated) {
-    return res.status(404).json({ error: 'Message not found' });
-  }
-  res.json({ message: 'Message updated successfully' });
-});
-
-// Delete message
-messageRouter.delete('/:id', (req, res) => {
-  const deleted = MessageModel.delete(req.params.id);
-  if (!deleted) {
-    return res.status(404).json({ error: 'Message not found' });
-  }
-  res.json({ message: 'Message deleted successfully' });
 });
 
 export default messageRouter;
